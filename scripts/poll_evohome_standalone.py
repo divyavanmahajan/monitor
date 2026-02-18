@@ -169,7 +169,7 @@ def format_time_display(timestamp: str | None) -> str:
         return "N/A"
     try:
         dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        return dt.strftime("%d/%m %H:%M:%S")
+        return dt.strftime("%d/%m %H:%M:%SZ")
     except (ValueError, AttributeError):
         return str(timestamp)[:19] if timestamp else "N/A"
 
@@ -225,8 +225,8 @@ async def main():
         "-i",
         "--interval",
         type=str,
-        default="10m",
-        help="Polling interval (1m to 120m, default: 10m)",
+        default="1m",
+        help="Polling interval (1m to 120m, default: 1m)",
     )
 
     parser.add_argument(
@@ -360,7 +360,7 @@ async def main():
                 try:
                     await loc.update()
                     now = datetime.now(timezone.utc)
-                    timestamp = now.isoformat()
+                    timestamp = now.strftime('%Y-%m-%dT%H:%M:%SZ')
                     system_mode = str(tcs.mode)
                     
                     row_data = [timestamp, system_mode]
@@ -394,7 +394,7 @@ async def main():
                     # Display
                     if not args.noshow:
                         os.system("clear" if os.name != "nt" else "cls")
-                        print(f"Evohome Monitoring - Updated: {datetime.now().strftime('%H:%M:%S')}")
+                        print(f"Evohome Monitoring - Updated: {datetime.now(timezone.utc).strftime('%H:%M:%SZ')}")
                         show_header = show_header_event.is_set()
                         if show_header:
                             show_header_event.clear()
@@ -409,7 +409,7 @@ async def main():
                         if not args.noshow and show_header_event.is_set():
                             show_header_event.clear()
                             os.system("clear" if os.name != "nt" else "cls")
-                            print(f"Evohome Monitoring - Updated: {datetime.now().strftime('%H:%M:%S')}")
+                            print(f"Evohome Monitoring - Updated: {datetime.now(timezone.utc).strftime('%H:%M:%SZ')}")
                             display_table(data_rows, zone_order, zones, show_header=True)
                             print(f"\nNext update in {args.interval}... (L for header, Ctrl+C to stop)")
                         
