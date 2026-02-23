@@ -5,13 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.6] - 2026-02-23
+
+### Added
+- Added `certifi` as a dependency and integrated a check into the setup wizard for the DigiCert High Assurance Root CA (fixing SSL errors on legacy macOS).
+- Automated `SSL_CERT_FILE` provisioning in the background LaunchDaemon plist.
+
+### Changed
+- Consistently run the setup wizard during `mesura-daemon --install` even if `.env` exists.
+- Consolidated all documentation (including macOS Daemon guide) into a unified `README.md`.
+
 ## [1.1.5] - 2026-02-23
 
 ### Added
 - Option to embed environment variables (API keys, credentials, etc.) directly into the `LaunchDaemon` plist for headless environments.
 - Security warning explaining that embedded plist variables are readable by any system user.
-- Added `certifi` as a dependency and integrated a check into the setup wizard for the DigiCert High Assurance Root CA (fixing SSL errors on older macOS).
-- Automated `SSL_CERT_FILE` provisioning in the background LaunchDaemon plist.
 
 ## [1.1.4] - 2026-02-23
 
