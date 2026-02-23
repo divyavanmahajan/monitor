@@ -20,6 +20,8 @@ def main():
     parser.add_argument("--energy-interval", default="1m", help="Energy polling interval")
     parser.add_argument("--weather-interval", default="10m", help="Weather polling interval")
     parser.add_argument("--evohome-interval", default="5m", help="Evohome polling interval")
+    parser.add_argument("--lat", help="Latitude for weather data")
+    parser.add_argument("--lon", help="Longitude for weather data")
     parser.add_argument("--separate", action="store_true", help="Store each monitor in a separate SQLite database")
     parser.add_argument("--setup", action="store_true", help="Run interactive setup wizard")
     
@@ -53,8 +55,8 @@ def main():
     # Weather Monitor
     weather_api_key = os.getenv("OPENWEATHER_API_KEY")
     if weather_api_key:
-        lat = os.getenv("LATITUDE", "50.83172")
-        lon = os.getenv("LONGITUDE", "5.76712")
+        lat = args.lat or os.getenv("LATITUDE", "50.83172")
+        lon = args.lon or os.getenv("LONGITUDE", "5.76712")
         weather = WeatherMonitor("weather", args.weather_interval, weather_api_key, lat=lat, lon=lon)
         master.add_controller(PollingController(weather, get_backends("weather"), args.weather_interval))
     else:
