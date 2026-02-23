@@ -6,7 +6,19 @@ macOS uses `launchd` for managing background services.
 - **LaunchAgents** run only when a specific user is logged in.
 - **LaunchDaemons** run in the background completely independent of user logins (e.g. system boot).
 
-## 1. Locate your `uv` and script paths
+## Automated Installation
+
+The easiest way to install the daemon is to run the provided setup script. It automatically discovers your username, project directory, and `uv` installation path, generates the plist, sets permissions, and loads the daemon.
+
+```bash
+sudo bash scripts/install-mac-daemon.sh
+```
+
+## Manual Installation
+
+If you prefer to configure it manually, follow the steps below.
+
+### 1. Locate your `uv` and script paths
 Because LaunchDaemons run in a stripped-down root environment, you should use absolute paths for both the `uv` tool and your project directory.
 
 Find the absolute path to your project directory. For example:
