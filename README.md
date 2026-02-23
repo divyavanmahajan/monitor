@@ -133,6 +133,14 @@ uv run mesura-combine-csv --data-dir data --target-db monitor.db
 
 Similar to the database merging script, it maps these CSVs to the appropriate tables (`energy`, `weather`, `evohome`) and automatically skips duplicate records based on timestamps.
 
+### `mesura-export-csv`
+
+If you want to extract the data stored in the unified SQLite database back into raw CSV format (e.g., for external backups or analysis), you can use the export script. This script reads the tables from `monitor.db` and overwrites `energy.csv`, `weather.csv`, and `evohome.csv` in the data directory using identical database schemas.
+
+```bash
+uv run mesura-export-csv --data-dir data --source-db monitor.db
+```
+
 This creates:
 - `sqlite3 data/energy.db`
 - `sqlite3 data/weather.db`
