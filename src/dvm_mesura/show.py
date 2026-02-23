@@ -1,7 +1,6 @@
 import sqlite3
 import argparse
 from pathlib import Path
-from tabulate import tabulate
 
 def show_table(db_path, table_name, num_rows):
     conn = sqlite3.connect(db_path)
@@ -32,7 +31,11 @@ def show_table(db_path, table_name, num_rows):
     if not rows:
         print("No records found.")
     else:
-        print(tabulate(rows, headers=columns, tablefmt="grid"))
+        import csv
+        import sys
+        writer = csv.writer(sys.stdout)
+        writer.writerow(columns)
+        writer.writerows(rows)
         
     conn.close()
 

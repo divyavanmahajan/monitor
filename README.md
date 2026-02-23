@@ -143,7 +143,7 @@ uv run mesura-export-csv --data-dir data --source-db monitor.db
 
 ### `mesura-show`
 
-To quickly inspect the latest data in the database, you can use the `mesura-show` command. It displays the most recent rows for each table (`energy`, `weather`, `evohome`) in a tabular format. By default, it shows the last 5 rows.
+To quickly inspect the latest data in the database, you can use the `mesura-show` command. It displays the most recent rows for each table (`energy`, `weather`, `evohome`) in CSV format. By default, it shows the last 5 rows.
 
 ```bash
 # Show the last 5 rows of all tables
