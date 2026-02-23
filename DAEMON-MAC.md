@@ -13,18 +13,10 @@ The easiest way to manage the LaunchDaemon is to use the built-in `mesura-daemon
 It will automatically discover your username, project directory, set permissions, and manage the `launchctl` commands. (Since it interacts with `launchd`, you'll be prompted for your local macOS password when running it).
 
 ```bash
-# Install and start the daemon in the background
-uv run mesura-daemon --install
+If you installed or are running the tool using `uvx` directly (which creates temporary isolated environments that are eventually cleared from cache), you **must** supply the `--uvx` flag! This configures the daemon so that it triggers `uvx dvm-mesura` natively instead of hardcoding an ephemeral cache path into the Launchd configuration:
 
-# Check if the daemon is active
-uv run mesura-daemon --check
-
-# View the last 20 lines of the daemon's log files
-uv run mesura-daemon --logs
-
-# Temporarily unload (stop) the daemon without removing it completely
-uv run mesura-daemon --unload
-
-# Utterly uninstall and remove the daemon from the system
-uv run mesura-daemon --uninstall
+```bash
+uvx dvm-mesura mesura-daemon --install --uvx
 ```
+
+### Checking and Managing logs

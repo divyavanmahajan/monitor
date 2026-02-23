@@ -17,7 +17,7 @@ def get_project_dir():
 def get_logs_dir():
     return get_project_dir() / "logs"
 
-def do_install():
+def do_install(use_uvx=False):
     actual_user = os.environ.get("SUDO_USER", getpass.getuser())
     if actual_user == "root":
         print("Could not determine your actual user. Please run without sudo.")
@@ -26,16 +26,22 @@ def do_install():
     project_dir = get_project_dir()
     python_dir = Path(sys.executable).parent
     
-    # Locate the mesura-all script inside the virtual environment
-    mesura_all_path = python_dir / "mesura-all"
-    if not mesura_all_path.exists():
-        mesura_all_path = shutil.which("mesura-all")
-        
-    if not mesura_all_path:
-        print("Could not find 'mesura-all' executable. Using python module instead.")
-        prog_args = f"<string>{sys.executable}</string>\n        <string>-m</string>\n        <string>dvm_mesura.main</string>"
+    if use_uvx:
+        # If running via uvx, we want the daemon to execute uvx explicitly 
+        # so it resolves the latest version rather than relying on an ephemeral cache path.
+        uvx_path = shutil.which("uvx") or "uvx"
+        prog_args = f"<string>{uvx_path}</string>\n                <string>--from</string>\n                <string>dvm-mesura</string>\n                <string>mesura-all</string>"
     else:
-        prog_args = f"<string>{mesura_all_path}</string>"
+        # Locate the mesura-all script inside the virtual environment
+        mesura_all_path = python_dir / "mesura-all"
+        if not mesura_all_path.exists():
+            mesura_all_path = shutil.which("mesura-all")
+            
+        if not mesura_all_path:
+            print("Could not find 'mesura-all' executable. Using python module instead.")
+            prog_args = f"<string>{sys.executable}</string>\n                <string>-m</string>\n                <string>dvm_mesura.main</string>"
+        else:
+            prog_args = f"<string>{mesura_all_path}</string>"
 
     plist_content = textwrap.dedent(f"""\
         <?xml version="1.0" encoding="UTF-8"?>
@@ -160,11 +166,12 @@ def main():
     parser.add_argument("--unload", action="store_true", help="Temporarily stop (unload) the LaunchDaemon")
     parser.add_argument("--check", action="store_true", help="Check if the LaunchDaemon is running")
     parser.add_argument("--logs", action="store_true", help="Tail the last 20 lines of daemon logs")
+    parser.add_argument("--uvx", action="store_true", help="Configure the daemon to explicitly run via 'uvx dvm-mesura' instead of a hardcoded path. Crucial if installing from an ephemeral uvx environment.")
     
     args = parser.parse_args()
     
     if args.install:
-        do_install()
+        do_install(use_uvx=args.uvx)
     elif args.uninstall:
         do_uninstall()
     elif args.unload:
