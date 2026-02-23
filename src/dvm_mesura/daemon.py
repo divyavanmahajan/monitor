@@ -28,13 +28,11 @@ def do_install(use_uvx=False):
     project_dir = get_project_dir()
     env_path = project_dir / ".env"
     
-    if not env_path.exists():
-        print(f"No .env file found in {project_dir}.")
-        print("Starting setup wizard to configure your environment...\n")
-        setup_wizard(env_path)
+    print(f"Configuring environment in {project_dir}...")
+    setup_wizard(env_path)
     
     # Reload env to get DATA_DIR for reporting
-    load_dotenv(env_path)
+    load_dotenv(env_path, override=True)
     data_dir_name = os.getenv("DATA_DIR", "data")
     data_dir_abs = (project_dir / data_dir_name).absolute()
 
