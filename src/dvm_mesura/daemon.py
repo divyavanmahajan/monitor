@@ -146,6 +146,17 @@ def do_uninstall():
     except subprocess.CalledProcessError as e:
         print(f"\nError uninstalling daemon: {e}")
 
+def do_start():
+    print("Loading daemon (starting)...")
+    try:
+        if not Path(PLIST_PATH).exists():
+            print(f"Error: Daemon not installed. Use --install first.")
+            return
+        subprocess.run(["sudo", "launchctl", "load", "-w", PLIST_PATH], check=True)
+        print("Success! Daemon started.")
+    except subprocess.CalledProcessError as e:
+        print(f"\nError starting daemon: {e}")
+
 def do_unload():
     print("Unloading daemon (temporarily stopping)...")
     try:
@@ -195,6 +206,7 @@ def main():
     parser.add_argument("--install", action="store_true", help="Install and start the LaunchDaemon")
     parser.add_argument("--uninstall", action="store_true", help="Uninstall and remove the LaunchDaemon")
     parser.add_argument("--unload", action="store_true", help="Temporarily stop (unload) the LaunchDaemon")
+    parser.add_argument("--start", action="store_true", help="Start (load) the LaunchDaemon if it was unloaded")
     parser.add_argument("--check", action="store_true", help="Check if the LaunchDaemon is running")
     parser.add_argument("--logs", action="store_true", help="Tail the last 20 lines of daemon logs")
     parser.add_argument("--uvx", action="store_true", help="Configure the daemon to explicitly run via 'uvx dvm-mesura' instead of a hardcoded path. Crucial if installing from an ephemeral uvx environment.")
@@ -207,6 +219,8 @@ def main():
         do_uninstall()
     elif args.unload:
         do_unload()
+    elif args.start:
+        do_start()
     elif args.check:
         do_check()
     elif args.logs:

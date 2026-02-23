@@ -58,6 +58,9 @@ If you need to temporarily stop it or completely remove it:
 # Temporarily unload (stop) the daemon without removing it completely
 mesura-daemon --unload
 
+# Reload (start) the daemon if it was stopped
+mesura-daemon --start
+
 # Utterly uninstall and remove the daemon from the system
 mesura-daemon --uninstall
 ```
