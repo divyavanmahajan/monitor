@@ -1,0 +1,25 @@
+[project]
+name = "monitor-suite"
+version = "0.1.0"
+description = "Home automation monitoring suite for energy, weather, and heating"
+readme = "README.md"
+authors = [
+    { name = "divyavanmahajan", email = "divyavanmahajan@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.9.0",
+    "evohome-async>=0.4.15",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "tabulate>=0.9.0",
+]
+
+[project.scripts]
+monitor-energy = "monitor_suite.energymeter:main"
+monitor-weather = "monitor_suite.openweathermap:main"
+monitor-evohome = "monitor_suite.evohome:main_cli"
+
+[build-system]
+requires = ["uv_build>=0.10.2,<0.11.0"]
+build-backend = "uv_build"

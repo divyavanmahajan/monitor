@@ -2,7 +2,7 @@ import pytest
 import responses
 import sqlite3
 from pathlib import Path
-from monitor.energymeter import fetch_energy_data, write_to_sqlite, API_URL
+from monitor_suite.energymeter import fetch_energy_data, write_to_sqlite, API_URL
 
 @responses.activate
 def test_fetch_energy_data():
