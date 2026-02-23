@@ -25,6 +25,9 @@ def main():
     parser.add_argument("--evohome-interval", default=os.getenv("EVOHOME_INTERVAL", "5m"), help="Evohome polling interval")
     parser.add_argument("--lat", default=os.getenv("LATITUDE"), help="Latitude for weather data")
     parser.add_argument("--lon", default=os.getenv("LONGITUDE"), help="Longitude for weather data")
+    parser.add_argument("--weather-key", default=os.getenv("OPENWEATHER_API_KEY"), help="OpenWeatherMap API Key")
+    parser.add_argument("--evohome-user", default=os.getenv("EVOHOME_USERNAME") or os.getenv("EVOHOME_EMAIL"), help="Evohome Username/Email")
+    parser.add_argument("--evohome-pass", default=os.getenv("EVOHOME_PASSWORD"), help="Evohome Password")
     parser.add_argument("--separate", action="store_true", default=os.getenv("SEPARATE_DBS", "false").lower() == "true", help="Store each monitor in a separate SQLite database")
     parser.add_argument("--setup", action="store_true", help="Run interactive setup wizard")
     
@@ -53,20 +56,17 @@ def main():
     master.add_controller(PollingController(energy, get_backends("energy"), args.energy_interval))
     
     # Weather Monitor
-    weather_api_key = os.getenv("OPENWEATHER_API_KEY")
-    if weather_api_key:
-        lat = args.lat or os.getenv("LATITUDE", "50.83172")
-        lon = args.lon or os.getenv("LONGITUDE", "5.76712")
-        weather = WeatherMonitor("weather", args.weather_interval, weather_api_key, lat=lat, lon=lon)
+    if args.weather_key:
+        lat = args.lat or "50.83172"
+        lon = args.lon or "5.76712"
+        weather = WeatherMonitor("weather", args.weather_interval, args.weather_key, lat=lat, lon=lon)
         master.add_controller(PollingController(weather, get_backends("weather"), args.weather_interval))
     else:
         print("Warning: OPENWEATHER_API_KEY not found. Weather monitor skipped.")
         
     # Evohome Monitor
-    evohome_user = os.getenv("EVOHOME_USERNAME") or os.getenv("EVOHOME_EMAIL")
-    evohome_pw = os.getenv("EVOHOME_PASSWORD")
-    if evohome_user and evohome_pw:
-        evohome = EvohomeMonitor("evohome", args.evohome_interval, evohome_user, evohome_pw)
+    if args.evohome_user and args.evohome_pass:
+        evohome = EvohomeMonitor("evohome", args.evohome_interval, args.evohome_user, args.evohome_pass)
         master.add_controller(PollingController(evohome, get_backends("evohome"), args.evohome_interval))
     else:
         print("Warning: Evohome credentials not found. Evohome monitor skipped.")

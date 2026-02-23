@@ -36,5 +36,6 @@
 - [x] Implement interactive `--setup` for `.env` configuration
 - [x] Add `--lat` and `--lon` CLI overrides
 - [x] Map all CLI options to `.env` settings
+- [x] Map all remaining `.env` settings (API keys, credentials) to CLI options
 - [x] Update `--setup` wizard to include interval and dir settings
 - [x] Verify functionality with manual tests

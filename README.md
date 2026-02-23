@@ -101,6 +101,15 @@ Alternatively, you can use separate databases per monitor:
 ```bash
 uv run mesura-all --separate
 ```
+
+### Command Line Overrides
+
+All environment variables can be overridden via CLI flags:
+- `--weather-key`: OpenWeatherMap API Key
+- `--evohome-user`: Evohome Username
+- `--evohome-pass`: Evohome Password
+- `--lat` / `--lon`: Location coordinates
+- `--data-dir`: Data storage path
 This creates:
 - `sqlite3 data/energy.db`
 - `sqlite3 data/weather.db`
