@@ -142,8 +142,7 @@ dmypy.json
 # Project specific
 logs/
 *.pid
-data/*.db
-data/*.csv
+data/
 *.db
 *.csv
 
