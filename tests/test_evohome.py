@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import sqlite3
 import os
 from pathlib import Path
@@ -35,9 +36,9 @@ def test_format_time_display():
     assert format_time_display(None) == "N/A"
     assert format_time_display("invalid") == "invalid"
 
-def test_evohome_write_to_sqlite(tmp_path):
+@pytest.mark.asyncio
+async def test_evohome_write_to_sqlite(tmp_path):
     """Test Evohome data persistence and schema evolution."""
-    output_csv = tmp_path / "rooms.csv"
     db_path = tmp_path / "rooms.db"
     
     sample_data = {
@@ -48,7 +49,7 @@ def test_evohome_write_to_sqlite(tmp_path):
     
     # 1. Initial write
     backend = SQLiteBackend(db_path)
-    backend.write(sample_data, "evohome")
+    await backend.write(sample_data, "evohome")
     
     assert db_path.exists()
     with sqlite3.connect(db_path) as conn:
@@ -69,7 +70,7 @@ def test_evohome_write_to_sqlite(tmp_path):
         "_12345_Living_Room": 22.0,
         "_67890_Bedroom": 18.5
     }
-    backend.write(evolved_data, "evohome")
+    await backend.write(evolved_data, "evohome")
     
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()

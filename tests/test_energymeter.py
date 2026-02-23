@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import sqlite3
 from unittest.mock import MagicMock, AsyncMock, patch
 from pathlib import Path
@@ -33,10 +34,10 @@ async def test_fetch_energy_data():
         assert processed["total_power_import_kwh"] == 1.1
         assert processed["total_power_import_t1_kwh"] == 2.2
 
-def test_write_to_sqlite(tmp_path):
+@pytest.mark.asyncio
+async def test_write_to_sqlite(tmp_path):
     """Test writing data to SQLite and automatic schema evolution."""
     # Setup temp file paths
-    output_csv = tmp_path / "energy.csv"
     db_path = tmp_path / "energy.db"
     
     sample_data = {
@@ -46,7 +47,7 @@ def test_write_to_sqlite(tmp_path):
     }
     
     backend = SQLiteBackend(db_path)
-    backend.write(sample_data, "energy")
+    await backend.write(sample_data, "energy")
     
     assert db_path.exists()
     
@@ -68,7 +69,7 @@ def test_write_to_sqlite(tmp_path):
         "total_power_import_t1_kwh": 11.0,
         "new_utility_field": 42.5
     }
-    backend.write(evolved_data, "energy")
+    await backend.write(evolved_data, "energy")
     
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()

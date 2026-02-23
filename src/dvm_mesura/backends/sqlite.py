@@ -1,20 +1,40 @@
 from __future__ import annotations
+import asyncio
 import sqlite3
 from pathlib import Path
 from typing import Any, Dict
 from ..core.base import Backend
 
 class SQLiteBackend(Backend):
-    """SQLite backend with automatic schema evolution."""
+    """SQLite backend with automatic schema evolution and concurrency protection."""
     
-    def __init__(self, db_path: str | Path):
-        self.db_path = Path(db_path)
-        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+    # Class-level registry for locks, keyed by database path to ensure
+    # that multiple instances targeting the same file share the same lock.
+    _locks: Dict[Path, asyncio.Lock] = {}
 
-    def write(self, data: Dict[str, Any], source_name: str) -> None:
+    def __init__(self, db_path: str | Path):
+        self.db_path = Path(db_path).absolute()
+        self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        
+        if self.db_path not in self._locks:
+            self._locks[self.db_path] = asyncio.Lock()
+        self._lock = self._locks[self.db_path]
+        
+        # Initialize WAL mode
+        with sqlite3.connect(self.db_path) as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
+
+    async def write(self, data: Dict[str, Any], source_name: str) -> None:
         """Write data to a table named after the source_name."""
         table_name = source_name.replace("-", "_")
         
+        async with self._lock:
+            # We run the blocking sqlite3 calls in a separate thread to keep the loop free
+            # although for this specific application, the lock already prevents concurrent writes.
+            await asyncio.to_thread(self._sync_write, data, table_name, source_name)
+
+    def _sync_write(self, data: Dict[str, Any], table_name: str, source_name: str) -> None:
+        """Synchronous write implementation called via asyncio.to_thread with a lock."""
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()

@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import responses
 import sqlite3
 import os
@@ -46,9 +47,9 @@ def test_flatten_weather_data():
     assert flattened["weather_main"] == "Clouds"
     assert flattened["dt"] == 1700000000
 
-def test_weather_write_to_sqlite(tmp_path):
+@pytest.mark.asyncio
+async def test_weather_write_to_sqlite(tmp_path):
     """Test weather data persistence and mocking context."""
-    output_csv = tmp_path / "weather.csv"
     db_path = tmp_path / "weather.db"
     
     weather_data = {
@@ -59,7 +60,7 @@ def test_weather_write_to_sqlite(tmp_path):
     }
     
     backend = SQLiteBackend(db_path)
-    backend.write(weather_data, "weather")
+    await backend.write(weather_data, "weather")
     
     assert db_path.exists()
     with sqlite3.connect(db_path) as conn:

@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import sqlite3
 import csv
 from pathlib import Path
@@ -18,23 +19,25 @@ def test_flatten_dict():
     assert flattened["a.b"] == 1
     assert flattened["c[0]"] == 1
 
-def test_sqlite_backend(tmp_path):
+@pytest.mark.asyncio
+async def test_sqlite_backend(tmp_path):
     db_path = tmp_path / "test.db"
     backend = SQLiteBackend(db_path)
     data = {"timestamp": "2026-02-23T10:00:00Z", "val": 1.5}
     
-    backend.write(data, "test_source")
+    await backend.write(data, "test_source")
     
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT val FROM test_source")
         assert cursor.fetchone()[0] == 1.5
 
-def test_csv_backend(tmp_path):
+@pytest.mark.asyncio
+async def test_csv_backend(tmp_path):
     backend = CSVBackend(tmp_path)
     data = {"timestamp": "2026-02-23T10:00:00Z", "val": 1.5}
     
-    backend.write(data, "test_source")
+    await backend.write(data, "test_source")
     
     csv_file = tmp_path / "test_source.csv"
     assert csv_file.exists()

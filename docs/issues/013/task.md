@@ -28,3 +28,8 @@
 - [x] Update main entry points
 - [x] Verify functionality with tests
 - [x] Update documentation
+
+## SQLite Concurrency Security
+- [x] Update `Backend` protocol to be asynchronous
+- [x] Implement `asyncio.Lock` and WAL mode in `SQLiteBackend`
+- [x] Add concurrency tests to verify thread safety

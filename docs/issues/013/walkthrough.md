@@ -9,6 +9,7 @@ I have completed the refactoring of the home automation monitoring suite. The ne
 - **Extensible Backends**: Implemented `SQLiteBackend` (shared DB) and `CSVBackend` (separate files).
 - **Table Renaming**: All SQLite tables are now named consistently: `energy`, `weather`, and `evohome`.
 - **Interval Parsing**: Added support for `s`, `m`, and `h` units with safety range checks.
+- **Concurrency Protection**: Secured SQLite writes using `asyncio.Lock` and enabled WAL (Write-Ahead Logging) mode to prevent database corruption.
 
 ### Refactored Monitors
 - [energy.py](file:///Users/divya/Documents/projects/homeautomation/monitor/src/dvm_mesura/monitors/energy.py): P1 Energy Meter monitor.
@@ -41,8 +42,8 @@ collected 13 items
  tests/test_evohome.py ✓✓✓✓         77% ███████▊  
  tests/test_openweathermap.py ✓✓✓  100% ██████████
 
-Results (0.33s):
-      13 passed
+Results (0.45s):
+      14 passed
 ```
 
 ### Manual Verification

@@ -32,7 +32,7 @@ class PollingController:
                 
                 # Write to all backends
                 for backend in self.backends:
-                    backend.write(processed_data, self.name)
+                    await backend.write(processed_data, self.name)
                 
                 # Calculate sleep time to maintain interval
                 elapsed = asyncio.get_event_loop().time() - start_time

@@ -4,7 +4,7 @@ from typing import Any, Dict, Protocol
 
 class Backend(Protocol):
     """Protocol for storage backends."""
-    def write(self, data: Dict[str, Any], source_name: str) -> None:
+    async def write(self, data: Dict[str, Any], source_name: str) -> None:
         """Write data to the storage backend."""
         ...
 
