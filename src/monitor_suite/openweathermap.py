@@ -381,8 +381,8 @@ Examples:
         "-o",
         "--output",
         type=str,
-        required=True,
-        help="Output CSV file path",
+        default="data/weatherdata.csv",
+        help="Output CSV file path (default: data/weatherdata.csv)",
     )
 
     parser.add_argument(
@@ -414,8 +414,9 @@ Examples:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
-    # Check if file exists
+    # Check if file exists and ensure directory exists
     output_path = Path(args.output)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
     file_exists = output_path.exists()
     write_header = True
 
