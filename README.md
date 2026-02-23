@@ -1,4 +1,4 @@
-# Monitor - Home Automation Monitoring Suite
+# dvm-mesura - Home Automation Monitoring Suite
 
 A comprehensive monitoring solution for home automation systems with energy meter polling, weather data collection, and SQLite storage.
 
@@ -35,7 +35,7 @@ OPENWEATHER_API_KEY=your_api_key_here
 ### API Configuration
 
 **Energy Meter:**
-Edit `API_URL` in `src/monitor_suite/energymeter.py`:
+Edit `API_URL` in `src/dvm_mesura/energymeter.py`:
 ```python
 API_URL = "http://p1meter-231dbe.local./api/v1/data"
 ```
@@ -56,7 +56,7 @@ Continuously polls P1 Energy Meter API and logs data to SQLite and CSV.
 **Usage:**
 ```bash
 # Default poll (1 minute)
-uv run monitor-energy
+uv run mesura-energy
 ```
 
 ### 2. Weather Data Collection
@@ -72,7 +72,7 @@ Fetches weather data from OpenWeatherMap API and correlates with heating data.
 **Usage:**
 ```bash
 # Default poll (10 minutes)
-uv run monitor-weather
+uv run mesura-weather
 ```
 
 ### 3. Room Temperature Polling
@@ -87,7 +87,7 @@ Fetches temperature data from Honeywell Evohome API.
 **Usage:**
 ```bash
 # Default poll (5 minutes)
-uv run monitor-evohome
+uv run mesura-evohome
 ```
 
 ### Data Inspection
@@ -108,7 +108,7 @@ monitor/
 ├── .gitignore         # Git ignore file
 ├── logs/              # Log directory
 ├── src/               # Source code
-│   └── monitor_suite/ # Core package
+│   └── dvm_mesura/   # Core package
 │       ├── energymeter.py
 │       ├── openweathermap.py
 │       └── evohome.py

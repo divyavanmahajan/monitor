@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **monitor** suite is a comprehensive monitoring and data collection system for home automation. It provides tools for polling various data sources (energy meters, weather APIs), storing data in both CSV and time-series databases (SQLite), and enabling visualization and analysis.
+The **dvm-mesura** suite is a comprehensive monitoring and data collection system for home automation. It provides tools for polling various data sources (energy meters, weather APIs), storing data in both CSV and time-series databases (SQLite), and enabling visualization and analysis.
 
 ## System Architecture
 
@@ -17,9 +17,9 @@ graph TB
     end
     
     subgraph "Monitor Scripts"
-        PE[poll_energymeter.py]
-        PW[poll_openweathermap.py]
-        PR[poll_evohome_standalone.py]
+        PE[energymeter.py]
+        PW[openweathermap.py]
+        PR[evohome.py]
     end
     
     subgraph "Storage Layer"
@@ -52,7 +52,7 @@ graph TB
 
 ### 1. Data Collection Scripts
 
-#### poll_energymeter.py
+#### energymeter.py
 
 **Purpose**: Continuously poll P1 Energy Meter API for real-time energy consumption data.
 
@@ -103,7 +103,7 @@ Add Timestamp
 CSV File    SQLite DB    Screen Display
 ```
 
-#### poll_openweathermap.py
+#### openweathermap.py
 
 **Purpose**: Collect weather data from OpenWeatherMap API for correlation with heating data.
 
@@ -134,7 +134,7 @@ CSV File    SQLite DB    Screen Display
 - Weather conditions
 - Sunrise/sunset times
 
-#### poll_evohome_standalone.py
+#### evohome.py
 
 **Purpose**: Fetches temperature data from Honeywell Evohome API.
 
@@ -378,7 +378,7 @@ The monitor suite complements evohome-async by:
 
 1. Create new polling script following pattern:
    ```python
-   # scripts/poll_newsource.py
+   # src/dvm_mesura/poll_newsource.py
    - parse_interval()
    - write_to_csv()
    - display_table()
@@ -402,14 +402,14 @@ The monitor suite complements evohome-async by:
 
 ```bash
 # Local development with file-based storage
-python scripts/poll_energymeter.py -o data/energy.csv --noshow
+uv run mesura-energy --output data/energy.csv --noshow
 ```
 
 ### Production
 
 ```bash
 # Background service
-nohup uv run monitor-energy &
+nohup uv run mesura-energy &
 ```
 
 ### Docker (Future)

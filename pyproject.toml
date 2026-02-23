@@ -1,5 +1,5 @@
 [project]
-name = "monitor-suite"
+name = "dvm-mesura"
 version = "0.1.0"
 description = "Home automation monitoring suite for energy, weather, and heating"
 readme = "README.md"
@@ -16,9 +16,9 @@ dependencies = [
 ]
 
 [project.scripts]
-monitor-energy = "monitor_suite.energymeter:main"
-monitor-weather = "monitor_suite.openweathermap:main"
-monitor-evohome = "monitor_suite.evohome:main_cli"
+mesura-energy = "dvm_mesura.energymeter:main"
+mesura-weather = "dvm_mesura.openweathermap:main"
+mesura-evohome = "dvm_mesura.evohome:main_cli"
 
 [build-system]
 requires = ["uv_build>=0.10.2,<0.11.0"]

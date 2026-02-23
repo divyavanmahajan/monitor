@@ -3,7 +3,7 @@ import responses
 import sqlite3
 import os
 from pathlib import Path
-from monitor_suite.openweathermap import fetch_weather_data, write_to_sqlite, flatten_weather_data
+from dvm_mesura.openweathermap import fetch_weather_data, write_to_sqlite, flatten_weather_data
 
 @responses.activate
 def test_fetch_weather_data():
