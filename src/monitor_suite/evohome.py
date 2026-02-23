@@ -225,8 +225,8 @@ async def main():
         "-i",
         "--interval",
         type=str,
-        default="1m",
-        help="Polling interval (1m to 120m, default: 1m)",
+        default="5m",
+        help="Polling interval (1m to 120m, default: 5m)",
     )
 
     parser.add_argument(

@@ -55,8 +55,8 @@ Continuously polls P1 Energy Meter API and logs data to SQLite and CSV.
 
 **Usage:**
 ```bash
-# Poll every 5 minutes
-uv run monitor-energy -i 5m
+# Default poll (1 minute)
+uv run monitor-energy
 ```
 
 ### 2. Weather Data Collection
@@ -71,8 +71,8 @@ Fetches weather data from OpenWeatherMap API and correlates with heating data.
 
 **Usage:**
 ```bash
-# Poll weather every 30 minutes
-uv run monitor-weather -i 30m
+# Default poll (10 minutes)
+uv run monitor-weather
 ```
 
 ### 3. Room Temperature Polling
@@ -86,8 +86,8 @@ Fetches temperature data from Honeywell Evohome API.
 
 **Usage:**
 ```bash
-# Poll rooms every 10 minutes
-uv run monitor-evohome -i 10m
+# Default poll (5 minutes)
+uv run monitor-evohome
 ```
 
 ### Data Inspection

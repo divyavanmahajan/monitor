@@ -348,8 +348,8 @@ Examples:
         "-i",
         "--interval",
         type=str,
-        default="10m",
-        help="Polling interval (1m to 120m, default: 10m)",
+        default="1m",
+        help="Polling interval (1m to 120m, default: 1m)",
     )
 
     parser.add_argument(
