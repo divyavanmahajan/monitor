@@ -1,23 +1,37 @@
 import pytest
-import responses
 import sqlite3
+from unittest.mock import MagicMock, AsyncMock, patch
 from pathlib import Path
-from dvm_mesura.energymeter import fetch_energy_data, write_to_sqlite, API_URL
+from dvm_mesura.monitors.energy import EnergyMonitor
+from dvm_mesura.backends.sqlite import SQLiteBackend
+from dvm_mesura.core.helpers import flatten_dict
 
-@responses.activate
-def test_fetch_energy_data():
-    """Test fetching energy data with a mocked API response."""
+@pytest.mark.asyncio
+async def test_fetch_energy_data():
+    """Test fetching energy data with a mocked aiohttp response."""
     mock_data = {
         "active_tariff": 2,
-        "total_power_import_t1_kwh": 1000.123,
-        "total_power_import_t2_kwh": 2000.456,
-        "total_power_export_kwh": 500.789,
-        "total_gas_m3": 1500.001
+        "total_power_import_kwh": 1.1,
+        "total_power_import_t1_kwh": 2.2,
+        "total_power_import_t2_kwh": 3.3,
+        "total_power_export_kwh": 4.4,
+        "total_gas_m3": 5.5
     }
-    responses.add(responses.GET, API_URL, json=mock_data, status=200)
+    API_URL = "http://p1meter-231dbe.local./api/v1/data"
     
-    data = fetch_energy_data()
-    assert data == mock_data
+    with patch("aiohttp.ClientSession.get") as mock_get:
+        mock_ctx = AsyncMock()
+        mock_ctx.raise_for_status = MagicMock()
+        mock_ctx.json = AsyncMock(return_value=mock_data)
+        mock_ctx.__aenter__.return_value = mock_ctx
+        mock_get.return_value = mock_ctx
+        
+        monitor = EnergyMonitor("test", "1m", API_URL)
+        data = await monitor.fetch_data()
+        processed = monitor.process_data(data)
+        assert processed["active_tariff"] == 2
+        assert processed["total_power_import_kwh"] == 1.1
+        assert processed["total_power_import_t1_kwh"] == 2.2
 
 def test_write_to_sqlite(tmp_path):
     """Test writing data to SQLite and automatic schema evolution."""
@@ -31,18 +45,18 @@ def test_write_to_sqlite(tmp_path):
         "total_power_import_t1_kwh": 10.5
     }
     
-    # 1. Initial write (should create table)
-    write_to_sqlite(sample_data, output_csv)
+    backend = SQLiteBackend(db_path)
+    backend.write(sample_data, "energy")
     
     assert db_path.exists()
     
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM readings")
+        cursor.execute("SELECT * FROM energy")
         rows = cursor.fetchall()
         assert len(rows) == 1
         # Check if active_tariff is there
-        cursor.execute("PRAGMA table_info(readings)")
+        cursor.execute("PRAGMA table_info(energy)")
         cols = [row[1] for row in cursor.fetchall()]
         assert "active_tariff" in cols
         assert "total_power_import_t1_kwh" in cols
@@ -54,14 +68,14 @@ def test_write_to_sqlite(tmp_path):
         "total_power_import_t1_kwh": 11.0,
         "new_utility_field": 42.5
     }
-    write_to_sqlite(evolved_data, output_csv)
+    backend.write(evolved_data, "energy")
     
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
-        cursor.execute("PRAGMA table_info(readings)")
+        cursor.execute("PRAGMA table_info(energy)")
         cols = [row[1] for row in cursor.fetchall()]
         assert "new_utility_field" in cols
         
-        cursor.execute("SELECT new_utility_field FROM readings WHERE timestamp=?", ("2026-02-23T10:10:00Z",))
+        cursor.execute("SELECT new_utility_field FROM energy WHERE timestamp=?", ("2026-02-23T10:10:00Z",))
         val = cursor.fetchone()[0]
         assert val == 42.5
