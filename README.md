@@ -141,6 +141,21 @@ If you want to extract the data stored in the unified SQLite database back into 
 uv run mesura-export-csv --data-dir data --source-db monitor.db
 ```
 
+### `mesura-show`
+
+To quickly inspect the latest data in the database, you can use the `mesura-show` command. It displays the most recent rows for each table (`energy`, `weather`, `evohome`) in a tabular format. By default, it shows the last 5 rows.
+
+```bash
+# Show the last 5 rows of all tables
+uv run mesura-show
+
+# Show the last 10 rows
+uv run mesura-show -n 10
+
+# Show a specific table
+uv run mesura-show --table energy
+```
+
 This creates:
 - `sqlite3 data/energy.db`
 - `sqlite3 data/weather.db`
