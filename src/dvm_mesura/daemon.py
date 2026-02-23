@@ -53,6 +53,36 @@ def do_install(use_uvx=False):
                 
         prog_args = f"<string>{uv_path}</string>\n                <string>run</string>\n                <string>mesura-all</string>"
 
+    embed_env = input("Do you want to embed your environment variables directly in the LaunchDaemon? [Y/n]: ").lower() != 'n'
+    env_vars_plist = ""
+    
+    if embed_env:
+        print("\nWARNING: Variables embedded in the LaunchDaemon plist can be read by any user on this system (stored in /Library/LaunchDaemons/).")
+        # Load the latest values decided during setup
+        load_dotenv(env_path, override=True)
+        relevant_vars = [
+            "ENERGY_API_URL", "ENERGY_INTERVAL", 
+            "OPENWEATHER_API_KEY", "WEATHER_INTERVAL", 
+            "LATITUDE", "LONGITUDE",
+            "EVOHOME_USERNAME", "EVOHOME_EMAIL", "EVOHOME_PASSWORD", "EVOHOME_INTERVAL",
+            "DATA_DIR", "SEPARATE_DBS"
+        ]
+        
+        env_dict_lines = []
+        for var in relevant_vars:
+            val = os.getenv(var)
+            if val is not None:
+                # Plist keys and values must be escaped strings in the dict
+                env_dict_lines.append(f"                <key>{var}</key>")
+                env_dict_lines.append(f"                <string>{val}</string>")
+        
+        if env_dict_lines:
+            env_vars_plist = "\n".join(env_dict_lines)
+            
+    # Always include PATH
+    path_val = f"/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:{python_dir}"
+    env_vars_plist += f"\n                <key>PATH</key>\n                <string>{path_val}</string>"
+
     plist_content = textwrap.dedent(f"""\
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -74,8 +104,7 @@ def do_install(use_uvx=False):
 
             <key>EnvironmentVariables</key>
             <dict>
-                <key>PATH</key>
-                <string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:{python_dir}</string>
+{env_vars_plist}
             </dict>
 
             <key>RunAtLoad</key>
