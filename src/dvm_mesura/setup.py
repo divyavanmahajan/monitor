@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv, set_key
+import certifi
+import subprocess
 
 def setup_wizard(env_path: Path | None = None):
     """Interactive setup wizard to configure .env file."""
@@ -50,3 +52,23 @@ def setup_wizard(env_path: Path | None = None):
 
     print(f"\nConfiguration saved to {env_path.absolute()}")
     print("You can now run 'mesura-all' to start monitoring.")
+    
+    check_digicert()
+
+def check_digicert():
+    """Checks if DigiCert root CA is in certifi bundle (required for some legacy macOS versions)."""
+    cert_path = certifi.where()
+    try:
+        with open(cert_path, 'r') as f:
+            content = f.read()
+            if "DigiCert High Assurance" not in content:
+                print("\n" + "!" * 65)
+                print("WARNING: DigiCert High Assurance Root CA missing from certifi bundle!")
+                print("This is common on older macOS versions and causes SSL errors with Evohome.")
+                print("\nTo fix this, run the following command:")
+                print(f"curl -L https://cacerts.digicert.com/DigiCertHighAssuranceEVRootCA.pem >> {cert_path}")
+                print("!" * 65 + "\n")
+            else:
+                print("\n[✔] SSL Certificate bundle verified (DigiCert CA found).")
+    except Exception as e:
+        print(f"Note: Could not verify SSL bundle: {e}")

@@ -138,6 +138,20 @@ cd ~/mesura
 mesura-daemon --install
 ```
 
+### 4. Troubleshooting: SSL Errors / DigiCert CA
+On older versions of macOS, the **DigiCert High Assurance Root CA** might be missing from the system keychain, leading to SSL errors when connecting to `tccna.resideo.com` (Evohome).
+
+If you see SSL/TLS certificate verification warnings:
+1. Ensure the `SSL_CERT_FILE` environment variable is set to your `certifi` bundle path.
+2. Manually append the DigiCert CA to your bundle:
+
+```bash
+# Append DigiCert CA to the certifi bundle
+curl -L https://cacerts.digicert.com/DigiCertHighAssuranceEVRootCA.pem >> $(uv run python -c "import certifi; print(certifi.where())")
+```
+
+The `mesura-daemon` tool automatically configures `SSL_CERT_FILE` in the background for you, and the setup wizard (`--setup`) will check if this certificate is present.
+
 ---
 
 <a name="auxiliary_utilities"></a>

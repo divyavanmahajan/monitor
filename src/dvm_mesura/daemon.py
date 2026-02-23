@@ -9,6 +9,7 @@ import argparse
 from pathlib import Path
 from dvm_mesura.setup import setup_wizard
 from dotenv import load_dotenv
+import certifi
 
 PLIST_NAME = "com.vanmahajan.mesura.plist"
 PLIST_PATH = f"/Library/LaunchDaemons/{PLIST_NAME}"
@@ -79,9 +80,10 @@ def do_install(use_uvx=False):
         if env_dict_lines:
             env_vars_plist = "\n".join(env_dict_lines)
             
-    # Always include PATH
+    # Always include PATH and SSL_CERT_FILE
     path_val = f"/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:{python_dir}"
     env_vars_plist += f"\n                <key>PATH</key>\n                <string>{path_val}</string>"
+    env_vars_plist += f"\n                <key>SSL_CERT_FILE</key>\n                <string>{certifi.where()}</string>"
 
     plist_content = textwrap.dedent(f"""\
         <?xml version="1.0" encoding="UTF-8"?>

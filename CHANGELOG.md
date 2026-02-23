@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Option to embed environment variables (API keys, credentials, etc.) directly into the `LaunchDaemon` plist for headless environments.
 - Security warning explaining that embedded plist variables are readable by any system user.
+- Added `certifi` as a dependency and integrated a check into the setup wizard for the DigiCert High Assurance Root CA (fixing SSL errors on older macOS).
+- Automated `SSL_CERT_FILE` provisioning in the background LaunchDaemon plist.
 
 ## [1.1.4] - 2026-02-23
 
