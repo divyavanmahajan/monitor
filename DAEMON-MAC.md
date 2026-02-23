@@ -14,7 +14,17 @@ It will automatically discover your username, project directory, set permissions
 
 ### 1. Install & Start
 
-If you are using it through a project directory with `uv run`:
+If you have installed the package globally as a tool using `uv`:
+
+```bash
+# Step 1: Install the package globally
+uv tool install dvm-mesura
+
+# Step 2: Install and start the daemon in the background
+mesura-daemon --install
+```
+
+If you are using it locally through a project directory with `uv run`:
 
 ```bash
 # Install and start the daemon in the background
@@ -30,14 +40,14 @@ uvx dvm-mesura mesura-daemon --install --uvx
 
 ### 2. Checking and Managing Logs
 
-Once installed, you can check its status or view the logs. *(Remember to replace `uv run` with `uvx dvm-mesura` if you installed via `uvx`).*
+Once installed, you can check its status or view the logs. *(Remember to use the appropriate prefix like `uv run` or `uvx dvm-mesura` if you didn't install the tool globally).*
 
 ```bash
 # Check if the daemon is active
-uv run mesura-daemon --check
+mesura-daemon --check
 
 # View the last 20 lines of the daemon's log files
-uv run mesura-daemon --logs
+mesura-daemon --logs
 ```
 
 ### 3. Uninstall / Stop
@@ -46,8 +56,8 @@ If you need to temporarily stop it or completely remove it:
 
 ```bash
 # Temporarily unload (stop) the daemon without removing it completely
-uv run mesura-daemon --unload
+mesura-daemon --unload
 
 # Utterly uninstall and remove the daemon from the system
-uv run mesura-daemon --uninstall
+mesura-daemon --uninstall
 ```
