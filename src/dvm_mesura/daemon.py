@@ -197,6 +197,46 @@ def do_logs():
     else:
         print("\nNo standard log found.")
 
+def do_env_check():
+    project_dir = get_project_dir()
+    env_path = project_dir / ".env"
+    
+    print("=== Environment Variable Check ===")
+    print(f"Project Directory: {project_dir}")
+    print(f".env File Path:    {env_path}")
+    
+    if env_path.exists():
+        print(f"\n--- .env Contents ---")
+        try:
+            with open(env_path, 'r') as f:
+                print(f.read())
+        except Exception as e:
+            print(f"Error reading .env: {e}")
+    else:
+        print(f"\n[!] .env file does not exist.")
+
+    # List relevant environment variables
+    relevant_vars = [
+        "ENERGY_API_URL", "ENERGY_INTERVAL", 
+        "OPENWEATHER_API_KEY", "WEATHER_INTERVAL", 
+        "LATITUDE", "LONGITUDE",
+        "EVOHOME_USERNAME", "EVOHOME_EMAIL", "EVOHOME_PASSWORD", "EVOHOME_INTERVAL",
+        "DATA_DIR", "SEPARATE_DBS"
+    ]
+    
+    print("\n--- Active Environment Variables (OS Process) ---")
+    # Load env so we see what the module thinks is active
+    load_dotenv(env_path, override=True)
+    for var in relevant_vars:
+        val = os.getenv(var)
+        status = val if val is not None else "[NOT SET]"
+        print(f"{var:<25}: {status}")
+
+    print("\n--- Effective CLI Defaults ---")
+    data_dir = os.getenv("DATA_DIR", "data")
+    print(f"Effective Data Dir       : {(project_dir / data_dir).absolute()}")
+    print("-" * 34)
+
 def main():
     if sys.platform != "darwin":
         print("The daemon management script is only supported on macOS.")
@@ -209,6 +249,7 @@ def main():
     parser.add_argument("--start", action="store_true", help="Start (load) the LaunchDaemon if it was unloaded")
     parser.add_argument("--check", action="store_true", help="Check if the LaunchDaemon is running")
     parser.add_argument("--logs", action="store_true", help="Tail the last 20 lines of daemon logs")
+    parser.add_argument("--env-check", action="store_true", help="Troubleshoot environment variables and .env configuration")
     parser.add_argument("--uvx", action="store_true", help="Configure the daemon to explicitly run via 'uvx dvm-mesura' instead of a hardcoded path. Crucial if installing from an ephemeral uvx environment.")
     
     args = parser.parse_args()
@@ -225,6 +266,8 @@ def main():
         do_check()
     elif args.logs:
         do_logs()
+    elif args.env_check:
+        do_env_check()
     else:
         parser.print_help()
 
