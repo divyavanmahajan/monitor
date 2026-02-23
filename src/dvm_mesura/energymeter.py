@@ -10,7 +10,7 @@ from .monitors.energy import EnergyMonitor
 
 def main():
     parser = argparse.ArgumentParser(description="Poll P1 Energy Meter API and log energy data")
-    parser.add_argument("-i", "--interval", default="1m", help="Polling interval")
+    parser.add_argument("-i", "--interval", default="5m", help="Polling interval")
     parser.add_argument("-o", "--output", default="data/energy.csv", help="Output CSV file path")
     args = parser.parse_args()
     

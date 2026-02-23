@@ -110,6 +110,18 @@ All environment variables can be overridden via CLI flags:
 - `--evohome-pass`: Evohome Password
 - `--lat` / `--lon`: Location coordinates
 - `--data-dir`: Data storage path
+
+## Auxiliary Scripts
+
+### `combine_db.py`
+
+If you previously used separate databases or legacy scripts (e.g., `weatherdata.db`, `rooms.db`) and wish to migrate this historical data into the unified tracking file, use the utility script:
+
+```bash
+uv run python scripts/combine_db.py --data-dir data --target-db monitor.db
+```
+
+This script intelligently automatically detects legacy databases matching predefined mappings (e.g., transferring `rooms.db:readings` into `monitor.db:evohome`). It inserts data while avoiding duplicate timestamps.
 This creates:
 - `sqlite3 data/energy.db`
 - `sqlite3 data/weather.db`

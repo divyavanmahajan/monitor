@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="Home Automation Monitoring Suite")
     parser.add_argument("--data-dir", default=os.getenv("DATA_DIR", "data"), help="Directory for data storage")
     parser.add_argument("--energy-api", default=os.getenv("ENERGY_API_URL", "http://p1meter-231dbe.local./api/v1/data"), help="Energy meter API URL")
-    parser.add_argument("--energy-interval", default=os.getenv("ENERGY_INTERVAL", "1m"), help="Energy polling interval")
+    parser.add_argument("--energy-interval", default=os.getenv("ENERGY_INTERVAL", "5m"), help="Energy polling interval")
     parser.add_argument("--weather-interval", default=os.getenv("WEATHER_INTERVAL", "10m"), help="Weather polling interval")
     parser.add_argument("--evohome-interval", default=os.getenv("EVOHOME_INTERVAL", "5m"), help="Evohome polling interval")
     parser.add_argument("--lat", default=os.getenv("LATITUDE"), help="Latitude for weather data")
