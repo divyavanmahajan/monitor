@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv, set_key
 
-def setup_wizard():
+def setup_wizard(env_path: Path | None = None):
     """Interactive setup wizard to configure .env file."""
-    env_path = Path(".env")
+    if env_path is None:
+        env_path = Path(".env")
     load_dotenv(env_path)
     
     print("=== DVM Mesura Setup Wizard ===")

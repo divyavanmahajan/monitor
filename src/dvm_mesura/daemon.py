@@ -7,6 +7,8 @@ import textwrap
 import subprocess
 import argparse
 from pathlib import Path
+from dvm_mesura.setup import setup_wizard
+from dotenv import load_dotenv
 
 PLIST_NAME = "com.vanmahajan.mesura.plist"
 PLIST_PATH = f"/Library/LaunchDaemons/{PLIST_NAME}"
@@ -24,6 +26,18 @@ def do_install(use_uvx=False):
         sys.exit(1)
 
     project_dir = get_project_dir()
+    env_path = project_dir / ".env"
+    
+    if not env_path.exists():
+        print(f"No .env file found in {project_dir}.")
+        print("Starting setup wizard to configure your environment...\n")
+        setup_wizard(env_path)
+    
+    # Reload env to get DATA_DIR for reporting
+    load_dotenv(env_path)
+    data_dir_name = os.getenv("DATA_DIR", "data")
+    data_dir_abs = (project_dir / data_dir_name).absolute()
+
     python_dir = Path(sys.executable).parent
     
     if use_uvx:
@@ -98,6 +112,11 @@ def do_install(use_uvx=False):
         subprocess.run(["sudo", "chmod", "644", PLIST_PATH], check=True)
         subprocess.run(["sudo", "launchctl", "load", "-w", PLIST_PATH], check=True)
         print("\nSuccess! The daemon has been installed and started.")
+        print("-" * 65)
+        print(f"DATA RESIDENCY:")
+        print(f"Your monitoring data will be stored in:")
+        print(f"  {data_dir_abs}")
+        print("-" * 65)
         
         # macOS TCC Warning
         if "Documents" in str(project_dir) or "Desktop" in str(project_dir) or "Downloads" in str(project_dir):
