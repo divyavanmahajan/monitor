@@ -21,6 +21,7 @@ mesura-weather = "dvm_mesura.openweathermap:main"
 mesura-evohome = "dvm_mesura.evohome:main_cli"
 mesura-all = "dvm_mesura.main:main"
 mesura-combine-db = "dvm_mesura.combine_db:main"
+mesura-combine-csv = "dvm_mesura.combine_csv:main"
 
 [build-system]
 requires = ["uv_build>=0.10.2,<0.11.0"]

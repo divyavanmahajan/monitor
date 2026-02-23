@@ -122,6 +122,17 @@ uv run mesura-combine-db --data-dir data --target-db monitor.db
 ```
 
 This script intelligently automatically detects legacy databases matching predefined mappings (e.g., transferring `rooms.db:readings` into `monitor.db:evohome`). It inserts data while avoiding duplicate timestamps.
+
+### `mesura-combine-csv`
+
+If you have legacy CSV files (`energy.csv`, `weatherdata.csv`, `temp.csv`, etc.) and want to migrate their data into the unified SQLite database, you can use:
+
+```bash
+uv run mesura-combine-csv --data-dir data --target-db monitor.db
+```
+
+Similar to the database merging script, it maps these CSVs to the appropriate tables (`energy`, `weather`, `evohome`) and automatically skips duplicate records based on timestamps.
+
 This creates:
 - `sqlite3 data/energy.db`
 - `sqlite3 data/weather.db`
