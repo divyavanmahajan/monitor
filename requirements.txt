@@ -1,0 +1,12 @@
+# Python dependencies for the home automation monitoring scripts
+#
+# Standard library modules (included with Python):
+# - argparse, asyncio, csv, datetime, logging, os, pathlib, re, select
+# - sqlite3, sys, threading, time, typing
+#
+# Third-party packages (install with: pip install -r requirements.txt):
+aiohttp>=3.9.0
+requests>=2.31.0
+tabulate>=0.9.0
+python-dotenv>=1.0.0
+evohome-async>=0.2.0

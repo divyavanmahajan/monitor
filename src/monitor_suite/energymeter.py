@@ -379,17 +379,6 @@ Examples:
         help="Do not display data on screen",
     )
 
-    parser.add_argument(
-        "--influx",
-        action="store_true",
-        help="Send data to InfluxDB",
-    )
-
-    parser.add_argument(
-        "--importcsv",
-        action="store_true",
-        help="Import existing CSV file to InfluxDB before starting",
-    )
 
     args = parser.parse_args()
 
@@ -409,17 +398,6 @@ Examples:
     # Store data rows for display
     data_rows: list[dict[str, Any]] = []
 
-    # Get InfluxDB config if needed
-    influx_config = None
-    if args.influx or args.importcsv:
-        influx_config = get_influxdb_config()
-        if not influx_config:
-            print(
-                "Warning: InfluxDB configuration not found. InfluxDB features disabled.",
-                file=sys.stderr,
-            )
-            args.influx = False
-            args.importcsv = False
 
     if file_exists:
         if args.overwrite:
@@ -443,12 +421,6 @@ Examples:
                     f"Warning: Could not read existing CSV file: {e}", file=sys.stderr
                 )
 
-    # Import CSV to InfluxDB if requested
-    if args.importcsv and influx_config and file_exists:
-        print("Importing CSV to InfluxDB...")
-        import_csv_to_influxdb(influx_config, str(output_path))
-        print("Import completed. Exiting.")
-        sys.exit(0)
 
     # Setup keyboard input handling for 'L' key
     show_header_event = threading.Event()
