@@ -1,208 +1,163 @@
 # dvm-mesura - Home Automation Monitoring Suite
 
-A comprehensive monitoring solution for home automation systems with energy meter polling, weather data collection, and SQLite storage.
+A robust, unified monitoring solution for home automation systems. It tracks energy usage (HomeWizard), weather data (OpenWeatherMap), and heating/room temperatures (Honeywell Evohome) while storing everything in a centralized SQLite database.
 
-## Quick Start
+## Table of Contents
+- [Installation](#installation)
+- [Setup Wizard & Configuration](#setup_wizard)
+- [Usage & CLI Options](#usage)
+- [macOS Background Daemon](#macos_daemon)
+- [Auxiliary Utilities](#auxiliary_utilities)
+- [Testing](#testing)
 
-### Prerequisites
+---
 
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management.
+<a name="installation"></a>
+## 📦 Installation
 
+This project uses [uv](https://github.com/astral-sh/uv) for high-performance dependency management.
+
+### Method 1: Global Tool (Recommended)
+Install `dvm-mesura` as a global CLI tool on your system:
 ```bash
-# Install dependencies and create virtual environment
-uv sync
+uv tool install dvm-mesura
+```
 
-# Install dependencies and create virtual environment
+### Method 2: Local Development
+Clone the repository and sync dependencies:
+```bash
 uv sync
+```
 
-# Run interactive setup to create .env
+---
+
+<a name="setup_wizard"></a>
+## 🛠 Setup Wizard & Configuration
+
+The suite requires configuration for API keys and credentials. You can handle this easily using the interactive **Setup Wizard**.
+
+### Running the Wizard
+```bash
+# If installed as a tool
+mesura-all --setup
+
+# If running locally
 uv run mesura-all --setup
 ```
 
-## Configuration
+The wizard will guide you through:
+- **Energy Meter**: API URL and polling interval.
+- **Weather**: OpenWeatherMap API Key, coordinates, and interval.
+- **Evohome**: Username/Email, Password, and interval.
+- **Data Storage**: Preferred directory and database mode (Unified vs. Separate).
 
-### Required .env File
+### Configuration Variables
+All settings are stored in a `.env` file in the project directory.
 
-Create a `.env` file in the monitor directory:
+| Environment Variable | Description | CLI Override | Default |
+|----------------------|-------------|--------------|---------|
+| `DATA_DIR` | Directory for databases/CSVs | `--data-dir` | `data` |
+| `ENERGY_API_URL` | HomeWizard P1 API URL | `--energy-api` | `http://p1meter-231dbe.local./api/v1/data` |
+| `ENERGY_INTERVAL` | Polling frequency | `--energy-interval` | `1m` |
+| `OPENWEATHER_API_KEY`| OpenWeatherMap API Key | `--weather-key` | [None] |
+| `WEATHER_INTERVAL` | Polling frequency | `--weather-interval`| `10m` |
+| `LATITUDE` | Site latitude | `--lat` | `50.83172` |
+| `LONGITUDE` | Site longitude | `--lon` | `5.76712` |
+| `EVOHOME_USERNAME` | Honeywell TCC Username | `--evohome-user` | [None] |
+| `EVOHOME_PASSWORD` | Honeywell TCC Password | `--evohome-pass` | [None] |
+| `EVOHOME_INTERVAL` | Polling frequency | `--evohome-interval`| `5m` |
+| `SEPARATE_DBS` | Store data in separate files| `--separate` | `false` |
 
-```ini
-# Evohome Credentials
-EVOHOME_EMAIL=your_email@example.com
-EVOHOME_PASSWORD=your_password_here
+---
 
-# OpenWeatherMap API
-OPENWEATHER_API_KEY=your_api_key_here
-```
+<a name="usage"></a>
+## 🚀 Usage & CLI Options
 
-### API Configuration
-
-**Energy Meter:**
-Edit `API_URL` in `src/dvm_mesura/energymeter.py`:
-```python
-API_URL = "http://p1meter-231dbe.local./api/v1/data"
-```
-
-## Features and Usage
-
-### 1. Energy Meter Polling
-
-Continuously polls P1 Energy Meter API and logs data to SQLite and CSV.
-
-**Features:**
-- Configurable polling intervals (10s to 120m)
-- CSV output with automatic flattening of nested JSON
-- SQLite database for time-series analysis
-- On-screen table display with key metrics
-- Interactive keyboard controls ('L' for header)
-
-**Usage:**
-```bash
-# Default poll (1 minute)
-uv run mesura-energy
-```
-
-### 2. Weather Data Collection
-
-Fetches weather data from OpenWeatherMap API and correlates with heating data.
-
-**Features:**
-- OpenWeatherMap API integration
-- CSV and SQLite logging with timestamps
-- Configurable polling intervals
-- Weather condition tracking
-
-**Usage:**
-```bash
-# Default poll (10 minutes)
-uv run mesura-weather
-```
-
-### 3. Room Temperature Polling
-
-Fetches temperature data from Honeywell Evohome API.
-
-**Features:**
-- Evohome TCC API integration
-- CSV and SQLite logging for room-level data
-- Standardized CLI arguments
-
-**Usage:**
-```bash
-# Default poll (5 minutes)
-uv run mesura-evohome
-```
-
-### Unified vs Separate Databases
-
-By default, all monitors share a single database:
-- `sqlite3 data/monitor.db`
-
-Alternatively, you can use separate databases per monitor:
-```bash
-uv run mesura-all --separate
-```
-
-### Command Line Overrides
-
-All environment variables can be overridden via CLI flags:
-- `--weather-key`: OpenWeatherMap API Key
-- `--evohome-user`: Evohome Username
-- `--evohome-pass`: Evohome Password
-- `--lat` / `--lon`: Location coordinates
-- `--data-dir`: Data storage path
-
-## Auxiliary Scripts
-
-### `mesura-combine-db`
-
-If you previously used separate databases or legacy scripts (e.g., `weatherdata.db`, `rooms.db`) and wish to migrate this historical data into the unified tracking file, use the utility script:
+### Running the Suite
+The primary entry point is `mesura-all`, which starts all configured monitors concurrently.
 
 ```bash
-uv run mesura-combine-db --data-dir data --target-db monitor.db
+# Start all monitors
+mesura-all
+
+# Run with overrides
+mesura-all --energy-interval 30s --separate
 ```
 
-This script intelligently automatically detects legacy databases matching predefined mappings (e.g., transferring `rooms.db:readings` into `monitor.db:evohome`). It inserts data while avoiding duplicate timestamps.
+### Individual Monitors
+You can also run monitors independently:
+- `mesura-energy`: Only Energy Meter
+- `mesura-weather`: Only OpenWeatherMap
+- `mesura-evohome`: Only Honeywell Evohome
 
-### `mesura-combine-csv`
+### Inspecting Data
+Use `mesura-show` to quickly view recent database records in CSV format.
+```bash
+# Show last 5 rows of all tables
+mesura-show
 
-If you have legacy CSV files (`energy.csv`, `weatherdata.csv`, `temp.csv`, etc.) and want to migrate their data into the unified SQLite database, you can use:
+# Show last 10 rows of weather data
+mesura-show --table weather -n 10
+```
+
+---
+
+<a name="macos_daemon"></a>
+## 🖥 macOS Background Daemon
+
+To run `mesura-all` continuously in the background (even after restarts), use the built-in `mesura-daemon` tool.
+
+### 1. Installation
+During installation, the wizard will run to ensure your variables are correct. It will also ask if you want to **embed settings** directly into the system plist (useful for headless environments).
 
 ```bash
-uv run mesura-combine-csv --data-dir data --target-db monitor.db
+# Standard install
+mesura-daemon --install
+
+# Install if using uvx
+uvx dvm-mesura mesura-daemon --install --uvx
 ```
 
-Similar to the database merging script, it maps these CSVs to the appropriate tables (`energy`, `weather`, `evohome`) and automatically skips duplicate records based on timestamps.
+### 2. Management Commands
+| Command | Action |
+|---------|--------|
+| `mesura-daemon --check` | Verify if the daemon is running |
+| `mesura-daemon --logs` | Tail the last 20 lines of daemon output/errors |
+| `mesura-daemon --unload`| Temporarily stop the daemon |
+| `mesura-daemon --start` | Restart an unloaded daemon |
+| `mesura-daemon --uninstall`| Completely remove the daemon from macOS |
+| `mesura-daemon --env-check`| **Troubleshoot**: Show .env path and active variables |
 
-### `mesura-export-csv`
+### 3. Troubleshooting: "Operation not permitted"
+macOS **TCC** (Privacy Protections) blocks background daemons from reading sensitive folders like `~/Documents`, `~/Desktop`, or `~/Downloads`.
 
-If you want to extract the data stored in the unified SQLite database back into raw CSV format (e.g., for external backups or analysis), you can use the export script. This script reads the tables from `monitor.db` and overwrites `energy.csv`, `weather.csv`, and `evohome.csv` in the data directory using identical database schemas.
-
+If your logs show `PermissionError: [Errno 1] Operation not permitted`, **move your project folder** to a non-protected location:
 ```bash
-uv run mesura-export-csv --data-dir data --source-db monitor.db
+mv ~/Documents/projects/monitor ~/mesura
+cd ~/mesura
+mesura-daemon --install
 ```
 
-### `mesura-show`
+---
 
-To quickly inspect the latest data in the database, you can use the `mesura-show` command. It displays the most recent rows for each table (`energy`, `weather`, `evohome`) in CSV format. By default, it shows the last 5 rows.
+<a name="auxiliary_utilities"></a>
+## 🛠 Auxiliary Utilities
 
-```bash
-# Show the last 5 rows of all tables
-uv run mesura-show
+### Migration Tools
+- **`mesura-combine-db`**: Migrates historical data from legacy `.db` files (`weatherdata.db`, etc.) into the unified `monitor.db`.
+- **`mesura-combine-csv`**: Imports existing CSV logs into the SQLite database while skipping duplicates.
 
-# Show the last 10 rows
-uv run mesura-show -n 10
+### Export Tools
+- **`mesura-export-csv`**: Extract SQLite data back into original CSV format for backups or external analysis.
 
-# Show a specific table
-uv run mesura-show --table energy
-```
+---
 
-This creates:
-- `sqlite3 data/energy.db`
-- `sqlite3 data/weather.db`
-- `sqlite3 data/evohome.db`
+<a name="testing"></a>
+## 🧪 Testing
 
-## Folder Structure
-
-```
-monitor/
-├── pyproject.toml     # Project metadata and dependencies
-├── uv.lock           # Frozen dependencies
-├── .env               # Environment variables (required)
-├── .gitignore         # Git ignore file
-├── logs/              # Log directory
-├── src/               # Source code
-│   └── dvm_mesura/   # Core package
-│       ├── energymeter.py
-│       ├── openweathermap.py
-│       └── evohome.py
-├── data/              # Data storage (SQLite & CSV files)
-│   ├── energy.db / energy.csv
-│   ├── rooms.db / rooms.csv
-│   └── weatherdata.db / weatherdata.csv
-├── tests/             # Unit tests
-└── docs/              # Documentation
-```
-
-## Data Flow
-
-```mermaid
-graph TD
-    A[Monitor Scripts] --> B[CSV Storage]
-    A --> C[SQLite Storage]
-    B --> D[Historical Analysis]
-    C --> E[Grafana / Business Intelligence]
-```
-
-## Testing
-
-Run tests using `uv`:
+Run the comprehensive test suite using `pytest`:
 ```bash
 uv run pytest
 ```
 
-## Related Projects
-
-- **[evohome-async](../evohome-async/)** - Async client for Honeywell TCC API
-- **SQLite** - Relational database
-- **Grafana** - Visualization platform
-- **Home Assistant** - Home automation platform
+The suite includes coverage for polling logic, database schema evolution, and API mocking.
