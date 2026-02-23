@@ -24,6 +24,7 @@ mesura-combine-db = "dvm_mesura.combine_db:main"
 mesura-combine-csv = "dvm_mesura.combine_csv:main"
 mesura-export-csv = "dvm_mesura.export_csv:main"
 mesura-show = "dvm_mesura.show:main"
+mesura-daemon = "dvm_mesura.daemon:main"
 
 [build-system]
 requires = ["uv_build>=0.10.2,<0.11.0"]
