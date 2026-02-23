@@ -10,9 +10,12 @@ Created a new module `src/dvm_mesura/setup.py` that provides an interactive CLI 
 - Uses current `.env` values as defaults if they exist.
 - Saves configuration securely to `.env`.
 
-### 2.- **Flexible Database Storage**: Monitors can now use separate databases via `--separate`.
+### 2. Flexible Database Storage and Location Overrides
+Refactored the backend initialization in `main.py` to allow for individual database files and location overrides.
+- **Separate Databases**: If `--separate` is used, monitors create individual files: `energy.db`, `weather.db`, and `evohome.db`.
 - **Location Overrides**: Latitude and Longitude can now be passed via the CLI (`--lat`, `--lon`), overriding `.env` settings.
-Refactored the backend initialization in `main.py` to allow for individual database files.
+- **Environment Parity**: Full synchronization between CLI arguments and `.env` settings. All options (intervals, data directory, separate DB flag) can now be configured via either method.
+- **Enhanced Setup**: The `--setup` wizard now covers every available configuration option.
 - **Default (Shared)**: All monitors write to `monitor.db`.
 - **Separate**: If `--separate` is used, monitors create individual files: `energy.db`, `weather.db`, and `evohome.db`.
 - This provides better data isolation if required by the user.

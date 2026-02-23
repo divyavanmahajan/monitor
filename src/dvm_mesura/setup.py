@@ -13,10 +13,16 @@ def setup_wizard():
     # Energy settings
     energy_url = input(f"Energy Meter API URL [{os.getenv('ENERGY_API_URL', 'http://p1meter-231dbe.local./api/v1/data')}]: ") or os.getenv('ENERGY_API_URL', 'http://p1meter-231dbe.local./api/v1/data')
     set_key(str(env_path), "ENERGY_API_URL", energy_url)
+    
+    energy_int = input(f"Energy Polling Interval [{os.getenv('ENERGY_INTERVAL', '1m')}]: ") or os.getenv('ENERGY_INTERVAL', '1m')
+    set_key(str(env_path), "ENERGY_INTERVAL", energy_int)
 
     # Weather settings
     weather_key = input(f"OpenWeatherMap API Key [{os.getenv('OPENWEATHER_API_KEY', '')}]: ") or os.getenv('OPENWEATHER_API_KEY', '')
     set_key(str(env_path), "OPENWEATHER_API_KEY", weather_key)
+    
+    weather_int = input(f"Weather Polling Interval [{os.getenv('WEATHER_INTERVAL', '10m')}]: ") or os.getenv('WEATHER_INTERVAL', '10m')
+    set_key(str(env_path), "WEATHER_INTERVAL", weather_int)
     
     lat = input(f"Latitude [{os.getenv('LATITUDE', '50.83172')}]: ") or os.getenv('LATITUDE', '50.83172')
     set_key(str(env_path), "LATITUDE", lat)
@@ -30,6 +36,16 @@ def setup_wizard():
     
     evo_pw = input(f"Evohome Password [{os.getenv('EVOHOME_PASSWORD', '')}]: ") or os.getenv('EVOHOME_PASSWORD', '')
     set_key(str(env_path), "EVOHOME_PASSWORD", evo_pw)
+    
+    evo_int = input(f"Evohome Polling Interval [{os.getenv('EVOHOME_INTERVAL', '5m')}]: ") or os.getenv('EVOHOME_INTERVAL', '5m')
+    set_key(str(env_path), "EVOHOME_INTERVAL", evo_int)
+
+    # General settings
+    data_dir = input(f"Data Directory [{os.getenv('DATA_DIR', 'data')}]: ") or os.getenv('DATA_DIR', 'data')
+    set_key(str(env_path), "DATA_DIR", data_dir)
+    
+    separate = input(f"Use separate databases? (true/false) [{os.getenv('SEPARATE_DBS', 'false')}]: ") or os.getenv('SEPARATE_DBS', 'false')
+    set_key(str(env_path), "SEPARATE_DBS", separate.lower())
 
     print(f"\nConfiguration saved to {env_path.absolute()}")
     print("You can now run 'mesura-all' to start monitoring.")

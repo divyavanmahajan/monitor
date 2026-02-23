@@ -14,15 +14,18 @@ from dvm_mesura.monitors.evohome import EvohomeMonitor
 from dvm_mesura.setup import setup_wizard
 
 def main():
+    # Load environment variables early for argparse defaults
+    load_dotenv()
+    
     parser = argparse.ArgumentParser(description="Home Automation Monitoring Suite")
-    parser.add_argument("--data-dir", default="data", help="Directory for data storage")
-    parser.add_argument("--energy-api", default="http://p1meter-231dbe.local./api/v1/data", help="Energy meter API URL")
-    parser.add_argument("--energy-interval", default="1m", help="Energy polling interval")
-    parser.add_argument("--weather-interval", default="10m", help="Weather polling interval")
-    parser.add_argument("--evohome-interval", default="5m", help="Evohome polling interval")
-    parser.add_argument("--lat", help="Latitude for weather data")
-    parser.add_argument("--lon", help="Longitude for weather data")
-    parser.add_argument("--separate", action="store_true", help="Store each monitor in a separate SQLite database")
+    parser.add_argument("--data-dir", default=os.getenv("DATA_DIR", "data"), help="Directory for data storage")
+    parser.add_argument("--energy-api", default=os.getenv("ENERGY_API_URL", "http://p1meter-231dbe.local./api/v1/data"), help="Energy meter API URL")
+    parser.add_argument("--energy-interval", default=os.getenv("ENERGY_INTERVAL", "1m"), help="Energy polling interval")
+    parser.add_argument("--weather-interval", default=os.getenv("WEATHER_INTERVAL", "10m"), help="Weather polling interval")
+    parser.add_argument("--evohome-interval", default=os.getenv("EVOHOME_INTERVAL", "5m"), help="Evohome polling interval")
+    parser.add_argument("--lat", default=os.getenv("LATITUDE"), help="Latitude for weather data")
+    parser.add_argument("--lon", default=os.getenv("LONGITUDE"), help="Longitude for weather data")
+    parser.add_argument("--separate", action="store_true", default=os.getenv("SEPARATE_DBS", "false").lower() == "true", help="Store each monitor in a separate SQLite database")
     parser.add_argument("--setup", action="store_true", help="Run interactive setup wizard")
     
     args = parser.parse_args()
@@ -30,9 +33,6 @@ def main():
     if args.setup:
         setup_wizard()
         return
-    
-    # Load environment variables
-    load_dotenv()
     
     data_dir = Path(args.data_dir)
     data_dir.mkdir(parents=True, exist_ok=True)

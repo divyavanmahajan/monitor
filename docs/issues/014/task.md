@@ -35,4 +35,6 @@
 - [x] Implement `--separate` option for per-monitor databases
 - [x] Implement interactive `--setup` for `.env` configuration
 - [x] Add `--lat` and `--lon` CLI overrides
+- [x] Map all CLI options to `.env` settings
+- [x] Update `--setup` wizard to include interval and dir settings
 - [x] Verify functionality with manual tests
