@@ -12,9 +12,11 @@ This project uses [uv](https://github.com/astral-sh/uv) for dependency managemen
 # Install dependencies and create virtual environment
 uv sync
 
-# Create .env file with required configuration
-cp .env.example .env
-# Edit .env with your credentials
+# Install dependencies and create virtual environment
+uv sync
+
+# Run interactive setup to create .env
+uv run mesura-all --setup
 ```
 
 ## Configuration
@@ -90,13 +92,19 @@ Fetches temperature data from Honeywell Evohome API.
 uv run mesura-evohome
 ```
 
-### Data Inspection
+### Unified vs Separate Databases
 
-| Database | Description |
-|---------|-------------|
-| `sqlite3 data/energy.db` | Inspect energy data |
-| `sqlite3 data/rooms.db` | Inspect rooms data |
-| `sqlite3 data/weatherdata.db` | Inspect weather data |
+By default, all monitors share a single database:
+- `sqlite3 data/monitor.db`
+
+Alternatively, you can use separate databases per monitor:
+```bash
+uv run mesura-all --separate
+```
+This creates:
+- `sqlite3 data/energy.db`
+- `sqlite3 data/weather.db`
+- `sqlite3 data/evohome.db`
 
 ## Folder Structure
 
