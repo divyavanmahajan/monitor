@@ -61,3 +61,22 @@ mesura-daemon --unload
 # Utterly uninstall and remove the daemon from the system
 mesura-daemon --uninstall
 ```
+
+### 4. Troubleshooting: "Operation not permitted"
+
+macOS has extremely strict background privacy protections called **TCC** (Transparency, Consent, and Control). 
+If your project is located in certain protected folders like `~/Documents`, `~/Desktop`, or `~/Downloads`, the background daemon is strictly blocked from reading or writing to the database files or virtual environment. 
+
+If `mesura-daemon --logs` displays:
+`PermissionError: [Errno 1] Operation not permitted`
+
+The easiest and most reliable fix for LaunchDaemons is simply to **move your project folder** out of the restricted user directories.
+
+```bash
+# Example: Move the project to a non-protected folder in your home directory
+mv ~/Documents/projects/homeautomation/monitor ~/mesura
+cd ~/mesura
+
+# Re-install the daemon from the new location
+uv run mesura-daemon --install
+```

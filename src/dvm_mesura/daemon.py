@@ -32,16 +32,14 @@ def do_install(use_uvx=False):
         uvx_path = shutil.which("uvx") or "uvx"
         prog_args = f"<string>{uvx_path}</string>\n                <string>--from</string>\n                <string>dvm-mesura</string>\n                <string>mesura-all</string>"
     else:
-        # Locate the mesura-all script inside the virtual environment
-        mesura_all_path = python_dir / "mesura-all"
-        if not mesura_all_path.exists():
-            mesura_all_path = shutil.which("mesura-all")
-            
-        if not mesura_all_path:
-            print("Could not find 'mesura-all' executable. Using python module instead.")
-            prog_args = f"<string>{sys.executable}</string>\n                <string>-m</string>\n                <string>dvm_mesura.main</string>"
-        else:
-            prog_args = f"<string>{mesura_all_path}</string>"
+        uv_path = shutil.which("uv")
+        if not uv_path:
+            # Fallback path if 'uv' isn't in sudo's PATH
+            uv_path = f"/Users/{actual_user}/.cargo/bin/uv"
+            if not Path(uv_path).exists():
+                uv_path = "/opt/homebrew/bin/uv"
+                
+        prog_args = f"<string>{uv_path}</string>\n                <string>run</string>\n                <string>mesura-all</string>"
 
     plist_content = textwrap.dedent(f"""\
         <?xml version="1.0" encoding="UTF-8"?>
@@ -100,6 +98,22 @@ def do_install(use_uvx=False):
         subprocess.run(["sudo", "chmod", "644", PLIST_PATH], check=True)
         subprocess.run(["sudo", "launchctl", "load", "-w", PLIST_PATH], check=True)
         print("\nSuccess! The daemon has been installed and started.")
+        
+        # macOS TCC Warning
+        if "Documents" in str(project_dir) or "Desktop" in str(project_dir) or "Downloads" in str(project_dir):
+            print("\n" + "!" * 65)
+            print("WARNING: macOS Privacy Protections (TCC) detected!")
+            print(f"Your project directory acts from a protected folder:")
+            print(f"-> {project_dir}")
+            print("\nLaunchDaemons run in the background as root and macOS STRICTLY blocks")
+            print("background daemons from reading/writing to ~/Documents or ~/Desktop.")
+            print("\nIf you see 'PermissionError: [Errno 1] Operation not permitted' in")
+            print("the logs, the easiest fix is moving your project folder somewhere else:")
+            print(f"   mv {project_dir} /Users/{actual_user}/mesura")
+            print(f"   cd /Users/{actual_user}/mesura")
+            print("   uv run mesura-daemon --install")
+            print("!" * 65)
+            
     except subprocess.CalledProcessError as e:
         print(f"\nError installing daemon: {e}")
     finally:
